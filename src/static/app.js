@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
           Array.isArray(details.participants) && details.participants.length
             ? `<ul class="participants-list">` +
               details.participants
-                .map((p) => `<li>${escapeHtml(p)}</li>`)
+                .map((p) => `<li>${escapeHtml(p)} <span class='delete-icon' onclick='unregisterParticipant("${escapeHtml(p)}")'>🗑️</span></li>`)
                 .join("") +
               `</ul>`
             : `<p class="no-participants">No participants yet</p>`;
@@ -109,6 +109,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Initialize app
+  // Function to unregister participant
+function unregisterParticipant(participant) {
+  // Logic to unregister the participant goes here
+  console.log(`Unregistering participant: ${participant}`);
+}
+
+// Initialize app
   fetchActivities();
 });
