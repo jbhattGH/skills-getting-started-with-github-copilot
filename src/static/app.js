@@ -4,6 +4,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
 
+  // Helper to avoid HTML injection when rendering names
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   // Function to fetch activities from API
   async function fetchActivities() {
     try {
@@ -20,12 +30,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const spotsLeft = details.max_participants - details.participants.length;
 
+        // Build participants markup (bulleted list) or a friendly placeholder
+        const participantsMarkup =
+          Array.isArray(details.participants) && details.participants.length
+            ? `<ul class="participants-list" style="margin:8px 0 0 1.1em; padding-left:0; color:#333;">` +
+              details.participants
+                .map((p) => `<li style="margin:4px 0; list-style: disc; margin-left: 1em;">${escapeHtml(p)}</li>`)
+                .join("") +
+              `</ul>`
+            : `<p class="no-participants" style="color:#666; font-style:italic; margin-top:8px;">No participants yet</p>`;
+
         activityCard.innerHTML = `
-          <h4>${name}</h4>
-          <p>${details.description}</p>
-          <p><strong>Schedule:</strong> ${details.schedule}</p>
-          <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          <h4 style="margin:0 0 6px 0;">${escapeHtml(name)}</h4>
+          <p style="margin:0 0 8px 0; color:#444;">${escapeHtml(details.description)}</p>
+          <p style="margin:0 0 6px 0; color:#555;"><strong>Schedule:</strong> ${escapeHtml(details.schedule)}</p>
+          <p style="margin:0 0 8px 0; color:#555;"><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          <div class="participants" style="margin-top:6px;">
+            <strong style="display:block; margin-bottom:4px; color:#333;">Participants:</strong>
+            ${participantsMarkup}
+          </div>
         `;
+
+        // Subtle card styling to make it look pretty
+        activityCard.style.boxShadow = "0 1px 3px rgba(0,0,0,0.08)";
+        activityCard.style.background = "#fff";
+        activityCard.style.marginBottom = "12px";
+        activityCard.style.padding = "12px";
+        activityCard.style.borderRadius = "8px";
+        activityCard.style.border = "1px solid #eee";
 
         activitiesList.appendChild(activityCard);
 
